@@ -17,7 +17,7 @@ module.exports = {
     const rawText = args.slice(1).join(' ');
     if (!rawText) {
       return message.reply({
-        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpremoverole @role :command`')],
+        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpremoverole @role your text here`')],
         allowedMentions: { repliedUser: false },
       });
     }
@@ -30,38 +30,21 @@ module.exports = {
       roleName = mentionedRole.name;
     } else {
       const plain = args[0]?.toLowerCase();
-      if (!plain) {
-        return message.reply({
-          embeds: [errorEmbed('Error', 'Please mention a role.\n**Usage:** `:helpremoverole @role :command`')],
-          allowedMentions: { repliedUser: false },
-        });
-      }
       roleKey = plain;
       roleName = plain;
     }
 
-    const entries = rawText.split(',').map(e => e.trim()).filter(Boolean);
-    const removed = [];
-    const notFound = [];
+    const removed = removeEntry(roleKey, rawText);
 
-    for (const entry of entries) {
-      const success = removeEntry(roleKey, entry);
-      if (success) removed.push(entry);
-      else notFound.push(entry);
-    }
-
-    if (removed.length === 0) {
+    if (!removed) {
       return message.reply({
-        embeds: [errorEmbed('Error', `None of those entries were found in the **${roleName}** help list.`)],
+        embeds: [errorEmbed('Error', `That text was not found in the **${roleName}** help list.`)],
         allowedMentions: { repliedUser: false },
       });
     }
 
-    let desc = `Removed \`${removed.join('`, `')}\` from the **${roleName}** help list.`;
-    if (notFound.length > 0) desc += `\n\nNot found: \`${notFound.join('`, `')}\``;
-
     return message.reply({
-      embeds: [successEmbed('Success', desc)],
+      embeds: [successEmbed('Success', `Removed from the **${roleName}** help list.`)],
       allowedMentions: { repliedUser: false },
     });
   },

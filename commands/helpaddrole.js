@@ -14,11 +14,11 @@ module.exports = {
       });
     }
 
-    // Everything after the first arg is the command text
+    // Everything after the role mention is saved as-is
     const rawText = args.slice(1).join(' ');
     if (!rawText) {
       return message.reply({
-        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpaddrole @role :command`')],
+        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpaddrole @role your text here`')],
         allowedMentions: { repliedUser: false },
       });
     }
@@ -31,27 +31,14 @@ module.exports = {
       roleName = mentionedRole.name;
     } else {
       const plain = args[0]?.toLowerCase();
-      if (!plain) {
-        return message.reply({
-          embeds: [errorEmbed('Error', 'Please mention a role.\n**Usage:** `:helpaddrole @role :command`')],
-          allowedMentions: { repliedUser: false },
-        });
-      }
       roleKey = plain;
       roleName = plain;
     }
 
-    // Split by comma so ":ban, :kick" becomes two entries
-    const entries = rawText.split(',').map(e => e.trim()).filter(Boolean);
-
-    for (const entry of entries) {
-      addEntry(roleKey, entry);
-    }
-
-    const added = entries.map(e => `\`${e}\``).join(', ');
+    addEntry(roleKey, rawText);
 
     return message.reply({
-      embeds: [successEmbed('Success', `Added ${added} to the **${roleName}** help list.`)],
+      embeds: [successEmbed('Success', `Added to the **${roleName}** help list.`)],
       allowedMentions: { repliedUser: false },
     });
   },
