@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 function formatEntries(entries) {
-  return entries.map(e => `• ${e}`).join('\n\u200b\n');
+  return entries.map(e => `• ${e}`).join('\n');
 }
 
 function helpEmbed(sections) {
@@ -14,25 +14,22 @@ function helpEmbed(sections) {
 
   if (keys.length === 0) {
     embed.setTitle('Commands');
-    embed.setDescription('No help entries added yet.\nUse `:helpaddrole @role <text>` to add some.');
+    embed.addFields({ name: '\u200b', value: 'No help entries added yet.' });
     return embed;
   }
 
   if (keys.length === 1) {
     const section = sections[keys[0]];
     embed.setTitle(section.name);
-    embed.setDescription(formatEntries(section.entries));
+    // Use a field instead of description — renders tighter in Discord
+    embed.addFields({ name: '\u200b', value: formatEntries(section.entries) });
     return embed;
   }
 
   embed.setTitle('\u200b');
   for (const [key, section] of Object.entries(sections)) {
     if (!section.entries || section.entries.length === 0) continue;
-    embed.addFields({
-      name: section.name,
-      value: formatEntries(section.entries),
-      inline: false,
-    });
+    embed.addFields({ name: section.name, value: formatEntries(section.entries), inline: false });
   }
 
   return embed;
