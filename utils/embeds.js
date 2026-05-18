@@ -1,5 +1,10 @@
 const { EmbedBuilder } = require('discord.js');
 
+function formatEntries(entries) {
+  // Each entry on its own line with a blank line between for spacing
+  return entries.map(e => `• \`${e}\``).join('\n\n');
+}
+
 function helpEmbed(sections) {
   const embed = new EmbedBuilder()
     .setColor(0x000000)
@@ -17,7 +22,7 @@ function helpEmbed(sections) {
   if (keys.length === 1) {
     const section = sections[keys[0]];
     embed.setTitle(section.name);
-    embed.setDescription(section.entries.map(e => `• \`${e}\``).join('\n'));
+    embed.setDescription(formatEntries(section.entries));
     return embed;
   }
 
@@ -26,7 +31,7 @@ function helpEmbed(sections) {
     if (!section.entries || section.entries.length === 0) continue;
     embed.addFields({
       name: section.name,
-      value: section.entries.map(e => `• \`${e}\``).join('\n'),
+      value: formatEntries(section.entries),
       inline: false,
     });
   }
