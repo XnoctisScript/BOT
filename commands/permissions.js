@@ -1,19 +1,13 @@
-const ROLES = {
-  owner:    '1503591897615302748',
-  staff:    '1503591897598529671',
-  trial:    '1503591897598529669',
-  support:  '1503591897598529670',
-  verified: '1503796042410491967',
-};
+const OWNER_ROLE_ID   = '1503591897615302748';
+const STAFF_ROLE_ID   = '1503591897598529671';
+const TRIAL_ROLE_ID   = '1503591897598529669';
+const SUPPORT_ROLE_ID = '1503591897598529670';
+const VERIFIED_ROLE_ID = '1503796042410491967';
 
-function hasRole(member, key) {
-  return member.roles.cache.has(ROLES[key]);
-}
+function isOwner(member)    { return member.roles.cache.has(OWNER_ROLE_ID); }
+function isStaff(member)    { return member.roles.cache.has(STAFF_ROLE_ID); }
+function isTrial(member)    { return member.roles.cache.has(TRIAL_ROLE_ID); }
+function isSupport(member)  { return member.roles.cache.has(SUPPORT_ROLE_ID); }
+function isVerified(member) { return member.roles.cache.has(VERIFIED_ROLE_ID); }
 
-function isOwner(member)    { return hasRole(member, 'owner'); }
-function isStaff(member)    { return hasRole(member, 'staff'); }
-function isTrial(member)    { return hasRole(member, 'trial'); }
-function isSupport(member)  { return hasRole(member, 'support'); }
-function isVerified(member) { return hasRole(member, 'verified'); }
-
-module.exports = { ROLES, isOwner, isStaff, isTrial, isSupport, isVerified };
+module.exports = { isOwner, isStaff, isTrial, isSupport, isVerified };
