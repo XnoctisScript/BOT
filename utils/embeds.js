@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 function formatEntries(entries) {
-  return entries.map(e => `• \`${e}\``).join('\n');
+  return entries.map(e => `• \`${e}\``).join('\n') + '\n\u200b';
 }
 
 function helpEmbed(sections) {
@@ -14,7 +14,7 @@ function helpEmbed(sections) {
 
   if (keys.length === 0) {
     embed.setTitle('Commands');
-    embed.addFields({ name: '\u200b', value: 'No help entries added yet.' });
+    embed.addFields({ name: '\u200b', value: 'No help entries added yet.\u200b' });
     return embed;
   }
 
