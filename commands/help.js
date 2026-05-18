@@ -1,6 +1,24 @@
 const { loadHelp } = require('../utils/helpManager');
 const { helpEmbed } = require('../utils/embeds');
-const { isOwner } = require('../utils/permissions');
+const { ROLES, isOwner, isStaff, isTrial, isSupport, isVerified } = require('../utils/permissions');
+
+// Map role key name to checker function
+const ROLE_CHECKS = {
+  owner:    isOwner,
+  staff:    isStaff,
+  trial:    isTrial,
+  support:  isSupport,
+  verified: isVerified,
+};
+
+const ROLE_NAMES = {
+  owner:    'Owner Commands',
+  staff:    'Staff Commands',
+  trial:    'Trial Commands',
+  support:  'Support Commands',
+  verified: 'Verified Commands',
+  public:   'Public Commands',
+};
 
 module.exports = {
   name: 'help',
@@ -16,18 +34,14 @@ module.exports = {
       if (!entries || entries.length === 0) continue;
 
       if (key === 'public') {
-        sections['public'] = { name: 'Public Commands', entries };
+        sections['public'] = { name: ROLE_NAMES['public'], entries };
         continue;
       }
-      if (key === 'staff') {
-        if (member.permissions.has('ManageMessages') || isOwner(member)) {
-          sections['staff'] = { name: 'Staff Commands', entries };
-        }
-        continue;
-      }
-      if (key === 'owner') {
-        if (isOwner(member)) {
-          sections['owner'] = { name: 'Owner Commands', entries };
+
+      // Built-in named roles
+      if (ROLE_CHECKS[key]) {
+        if (ROLE_CHECKS[key](member)) {
+          sections[key] = { name: ROLE_NAMES[key], entries };
         }
         continue;
       }
@@ -35,8 +49,7 @@ module.exports = {
       // Dynamic role by ID
       const role = message.guild.roles.cache.get(key);
       if (!role) continue;
-
-      if (member.roles.cache.has(key) || isOwner(member)) {
+      if (member.roles.cache.has(key)) {
         sections[key] = { name: `${role.name} Commands`, entries };
       }
     }

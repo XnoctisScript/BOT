@@ -1,6 +1,8 @@
 const { removeEntry } = require('../utils/helpManager');
 const { successEmbed, errorEmbed } = require('../utils/embeds');
-const { isOwner } = require('../utils/permissions');
+const { isOwner, ROLES } = require('../utils/permissions');
+
+const NAMED_ROLES = Object.keys(ROLES);
 
 module.exports = {
   name: 'helpremoverole',
@@ -17,7 +19,7 @@ module.exports = {
     const rawText = args.slice(1).join(' ');
     if (!rawText) {
       return message.reply({
-        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpremoverole @role your text here`')],
+        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpremoverole <owner/staff/trial/support/verified> text`')],
         allowedMentions: { repliedUser: false },
       });
     }
@@ -30,12 +32,18 @@ module.exports = {
       roleName = mentionedRole.name;
     } else {
       const plain = args[0]?.toLowerCase();
-      roleKey = plain;
-      roleName = plain;
+      if (NAMED_ROLES.includes(plain) || plain === 'public') {
+        roleKey = plain;
+        roleName = plain.charAt(0).toUpperCase() + plain.slice(1);
+      } else {
+        return message.reply({
+          embeds: [errorEmbed('Error', `Invalid role. Use: \`owner\`, \`staff\`, \`trial\`, \`support\`, \`verified\`, \`public\` or @mention a role.`)],
+          allowedMentions: { repliedUser: false },
+        });
+      }
     }
 
     const removed = removeEntry(roleKey, rawText);
-
     if (!removed) {
       return message.reply({
         embeds: [errorEmbed('Error', `That text was not found in the **${roleName}** help list.`)],
