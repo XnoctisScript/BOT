@@ -2,8 +2,6 @@ const { removeEntry } = require('../utils/helpManager');
 const { successEmbed, errorEmbed } = require('../utils/embeds');
 const { isOwner } = require('../utils/permissions');
 
-const VALID_ROLES = ['public', 'staff', 'owner'];
-
 module.exports = {
   name: 'helpremoverole',
   description: 'Remove text from a help role section',
@@ -16,34 +14,43 @@ module.exports = {
       });
     }
 
-    const role = args[0]?.toLowerCase();
     const text = args[1];
-
-    if (!role || !VALID_ROLES.includes(role)) {
-      return message.reply({
-        embeds: [errorEmbed('Error', `Invalid role. Valid roles: \`public\`, \`staff\`, \`owner\`.\n**Usage:** \`:helpremoverole <role> <text>\``)],
-        allowedMentions: { repliedUser: false },
-      });
-    }
-
     if (!text) {
       return message.reply({
-        embeds: [errorEmbed('Error', `Missing text argument.\n**Usage:** \`:helpremoverole ${role} <text>\``)],
+        embeds: [errorEmbed('Error', 'Missing text argument.\n**Usage:** `:helpremoverole @role <text>` or `:helpremoverole public <text>`')],
         allowedMentions: { repliedUser: false },
       });
     }
 
-    const removed = removeEntry(role, text);
+    let roleKey, roleName;
+
+    const mentionedRole = message.mentions.roles.first();
+    if (mentionedRole) {
+      roleKey = mentionedRole.id;
+      roleName = mentionedRole.name;
+    } else {
+      const plain = args[0]?.toLowerCase();
+      if (!plain) {
+        return message.reply({
+          embeds: [errorEmbed('Error', 'Please mention a role or use `public`, `staff`, or `owner`.\n**Usage:** `:helpremoverole @role <text>`')],
+          allowedMentions: { repliedUser: false },
+        });
+      }
+      roleKey = plain;
+      roleName = plain;
+    }
+
+    const removed = removeEntry(roleKey, text);
 
     if (!removed) {
       return message.reply({
-        embeds: [errorEmbed('Error', `\`${text}\` was not found in the **${role}** help list.`)],
+        embeds: [errorEmbed('Error', `\`${text}\` was not found in the **${roleName}** help list.`)],
         allowedMentions: { repliedUser: false },
       });
     }
 
     return message.reply({
-      embeds: [successEmbed('Success', `Removed \`${text}\` from the **${role}** help list.`)],
+      embeds: [successEmbed('Success', `Removed \`${text}\` from the **${roleName}** help list.`)],
       allowedMentions: { repliedUser: false },
     });
   },

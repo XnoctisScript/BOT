@@ -16,22 +16,27 @@ function saveHelp(data) {
   fs.writeFileSync(HELP_FILE, JSON.stringify(data, null, 2));
 }
 
-function addEntry(role, text) {
+function addEntry(roleKey, text) {
   const data = loadHelp();
-  if (!data[role]) return false;
-  if (!data[role].includes(text)) {
-    data[role].push(text);
+  if (!data[roleKey]) data[roleKey] = [];
+  if (!data[roleKey].includes(text)) {
+    data[roleKey].push(text);
     saveHelp(data);
   }
   return true;
 }
 
-function removeEntry(role, text) {
+function removeEntry(roleKey, text) {
   const data = loadHelp();
-  if (!data[role]) return false;
-  const idx = data[role].indexOf(text);
+  if (!data[roleKey]) return false;
+  const idx = data[roleKey].indexOf(text);
   if (idx === -1) return false;
-  data[role].splice(idx, 1);
+  data[roleKey].splice(idx, 1);
+  // Clean up empty role keys (but keep public/staff/owner always)
+  const defaults = ['public', 'staff', 'owner'];
+  if (data[roleKey].length === 0 && !defaults.includes(roleKey)) {
+    delete data[roleKey];
+  }
   saveHelp(data);
   return true;
 }
