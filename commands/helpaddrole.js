@@ -14,11 +14,10 @@ module.exports = {
       });
     }
 
-    // Everything after the role mention is saved as-is
     const rawText = args.slice(1).join(' ');
     if (!rawText) {
       return message.reply({
-        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpaddrole @role your text here`')],
+        embeds: [errorEmbed('Error', 'Missing text.\n**Usage:** `:helpaddrole @role line 1 | line 2 | line 3`')],
         allowedMentions: { repliedUser: false },
       });
     }
@@ -35,10 +34,15 @@ module.exports = {
       roleName = plain;
     }
 
-    addEntry(roleKey, rawText);
+    // Split by | so you can add multiple lines at once
+    const entries = rawText.split('|').map(e => e.trim()).filter(Boolean);
+
+    for (const entry of entries) {
+      addEntry(roleKey, entry);
+    }
 
     return message.reply({
-      embeds: [successEmbed('Success', `Added to the **${roleName}** help list.`)],
+      embeds: [successEmbed('Success', `Added ${entries.length} line(s) to the **${roleName}** help list.`)],
       allowedMentions: { repliedUser: false },
     });
   },
