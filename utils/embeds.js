@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 function formatEntries(entries) {
-  return entries.map(e => `• ${e}`).join('\n');
+  return entries.map(e => `• \`${e}\``).join('\n');
 }
 
 function helpEmbed(sections) {
@@ -21,7 +21,6 @@ function helpEmbed(sections) {
   if (keys.length === 1) {
     const section = sections[keys[0]];
     embed.setTitle(section.name);
-    // Use a field instead of description — renders tighter in Discord
     embed.addFields({ name: '\u200b', value: formatEntries(section.entries) });
     return embed;
   }
