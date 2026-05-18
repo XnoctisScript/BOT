@@ -15,7 +15,6 @@ module.exports = {
     for (const [key, entries] of Object.entries(data)) {
       if (!entries || entries.length === 0) continue;
 
-      // Built-in keys: public always visible, staff/owner gated
       if (key === 'public') {
         sections['public'] = { name: 'Public', entries };
         continue;
@@ -33,12 +32,14 @@ module.exports = {
         continue;
       }
 
-      // Dynamic role keys (role IDs)
+      // Dynamic role by ID — resolve actual role name from guild
+      const role = message.guild.roles.cache.get(key);
+      if (!role) continue;
+
+      const roleName = role.name; // e.g. "Moderator", "Admin", "Owner"
+
       if (member.roles.cache.has(key) || isOwner(member)) {
-        // Get the role name from the guild
-        const role = message.guild.roles.cache.get(key);
-        const roleName = role ? role.name : key;
-        sections[key] = { name: roleName, entries };
+        sections[key] = { name: `${roleName} Commands`, entries };
       }
     }
 
