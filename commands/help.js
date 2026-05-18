@@ -16,30 +16,28 @@ module.exports = {
       if (!entries || entries.length === 0) continue;
 
       if (key === 'public') {
-        sections['public'] = { name: 'Public', entries };
+        sections['public'] = { name: 'Public Commands', entries };
         continue;
       }
       if (key === 'staff') {
         if (member.permissions.has('ManageMessages') || isOwner(member)) {
-          sections['staff'] = { name: 'Staff', entries };
+          sections['staff'] = { name: 'Staff Commands', entries };
         }
         continue;
       }
       if (key === 'owner') {
         if (isOwner(member)) {
-          sections['owner'] = { name: 'Owner', entries };
+          sections['owner'] = { name: 'Owner Commands', entries };
         }
         continue;
       }
 
-      // Dynamic role by ID — resolve actual role name from guild
+      // Dynamic role by ID
       const role = message.guild.roles.cache.get(key);
       if (!role) continue;
 
-      const roleName = role.name; // e.g. "Moderator", "Admin", "Owner"
-
       if (member.roles.cache.has(key) || isOwner(member)) {
-        sections[key] = { name: `${roleName} Commands`, entries };
+        sections[key] = { name: `${role.name} Commands`, entries };
       }
     }
 
