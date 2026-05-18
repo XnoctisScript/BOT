@@ -1,8 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 function formatEntries(entries) {
-  // Each entry on its own line with a blank line between for spacing
-  return entries.map(e => `• \`${e}\``).join('\n\n');
+  return entries.map(e => `• ${e}`).join('\n\u200b\n');
 }
 
 function helpEmbed(sections) {
