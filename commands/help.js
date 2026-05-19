@@ -6,11 +6,8 @@ const {
   ComponentType,
 } = require('discord.js');
 
-const helpData = require('../help.json');
-
-// ── Role IDs — fill these in with your actual Discord role IDs ────────────────
+// ── Role IDs ──────────────────────────────────────────────────────────────────
 const ROLE_IDS = {
-  owner:         null,                           // server owner, no role needed
   staff_manager: '1503781011648151733',
   staff:         'STAFF_ROLE_ID_HERE',
   trial:         'TRIAL_ROLE_ID_HERE',
@@ -18,96 +15,393 @@ const ROLE_IDS = {
   verified:      'VERIFIED_ROLE_ID_HERE',
 };
 
-// ── Tier hierarchy (highest → lowest) ────────────────────────────────────────
-const TIERS = ['owner', 'staff_manager', 'staff', 'trial', 'support', 'verified', 'public'];
+// ── All commands per tier, split into categories ──────────────────────────────
+// Format: - `?cmd [args]` (aliases: `?alias`)
+const TIER_CATEGORIES = {
 
-// ── Work out which tier the member belongs to ─────────────────────────────────
-function getMemberTier(message) {
-  if (message.guild.ownerId === message.author.id) return 'owner';
+  verified: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+      ],
+    },
+  ],
 
-  const roleIds = message.member.roles.cache.map(r => r.id);
+  support: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+        '- `?poll [question] [choices]` — Start a poll (max 10 choices)',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+        '- `?membercount` — Get the server member count',
+        '- `?whois` — Get user information',
+        '- `?inviteinfo` — Get information about an invite',
+      ],
+    },
+    {
+      name: 'Moderation',
+      commands: [
+        '- `?warn` — Warn a member',
+        '- `?warnings` — Get warnings for a user',
+        '- `?clearwarn` — Clear warnings for a user',
+        '- `?delnote` — Delete a note about a member',
+        '- `?clearnotes` — Delete all notes for a member',
+        '- `?editnote` — Edit a note about a member',
+      ],
+    },
+  ],
 
-  for (const tier of TIERS) {
-    if (tier === 'owner' || tier === 'public') continue;
-    if (ROLE_IDS[tier] && roleIds.includes(ROLE_IDS[tier])) return tier;
-  }
+  trial: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+        '- `?poll [question] [choices]` — Start a poll (max 10 choices)',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+        '- `?membercount` — Get the server member count',
+        '- `?whois` — Get user information',
+        '- `?inviteinfo` — Get information about an invite',
+      ],
+    },
+    {
+      name: 'Moderation',
+      commands: [
+        '- `?warn` — Warn a member',
+        '- `?clearwarn` — Clear warnings for a user',
+        '- `?delnote` — Delete a note about a member',
+        '- `?clearnotes` — Delete all notes for a member',
+        '- `?editnote` — Edit a note about a member',
+      ],
+    },
+  ],
 
-  return 'public';
-}
+  staff: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+        '- `?poll [question] [choices]` — Start a poll (max 10 choices)',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+        '- `?membercount` — Get the server member count',
+        '- `?whois` — Get user information',
+        '- `?inviteinfo` — Get information about an invite',
+        '- `?clean` — Clean up Dyno responses',
+      ],
+    },
+    {
+      name: 'Moderation',
+      commands: [
+        '- `?warn` — Warn a member',
+        '- `?warnings` — Get warnings for a user',
+        '- `?clearwarn` — Clear warnings for a user',
+        '- `?delnote` — Delete a note about a member',
+        '- `?clearnotes` — Delete all notes for a member',
+        '- `?editnote` — Edit a note about a member',
+        '- `?mute` — Mute a member so they cannot type',
+        '- `?unmute` — Unmute a member',
+        '- `?deafen` — Deafen a member',
+        '- `?undeafen` — Undeafen a member',
+      ],
+    },
+  ],
+
+  staff_manager: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+        '- `?poll [question] [choices]` — Start a poll (max 10 choices)',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+        '- `?membercount` — Get the server member count',
+        '- `?whois` — Get user information',
+        '- `?inviteinfo` — Get information about an invite',
+        '- `?clean` — Clean up Dyno responses',
+        '- `?nick` — Change the bot nickname',
+        '- `?members` — List members in a role(s) (max 90)',
+        '- `?giveaway` — Create and manage giveaways',
+      ],
+    },
+    {
+      name: 'Moderation',
+      commands: [
+        '- `?warn` — Warn a member',
+        '- `?warnings` — Get warnings for a user',
+        '- `?clearwarn` — Clear warnings for a user',
+        '- `?delnote` — Delete a note about a member',
+        '- `?clearnotes` — Delete all notes for a member',
+        '- `?editnote` — Edit a note about a member',
+        '- `?mute` — Mute a member so they cannot type',
+        '- `?unmute` — Unmute a member',
+        '- `?deafen` — Deafen a member',
+        '- `?undeafen` — Undeafen a member',
+        '- `?kick` — Kick a member',
+        '- `?ban` — Ban a member, optional time limit',
+        '- `?unban` — Unban a member',
+        '- `?softban` — Softban a member (ban and immediate unban to delete messages)',
+        '- `?purge` — Delete a number of messages from a channel (limit 1000)',
+        '- `?announce` — Send an announcement using the bot',
+        '- `?modlogs` — Get a list of moderation logs for a user',
+        '- `?moderations` — Get a list of active moderations (timed)',
+        '- `?duration` — Change the duration of a mute/ban',
+        '- `?slowmode` — Enable/disable slowmode',
+      ],
+    },
+  ],
+
+  owner: [
+    {
+      name: 'Fun',
+      commands: [
+        '- `?rps` — Play Rock Paper Scissors with the bot',
+        '- `?flip` — Flip a coin',
+        '- `?flipcoin` — Flip a coin',
+        '- `?space` — Get info about the space station',
+        '- `?dadjoke` — Get a random Dad joke',
+        '- `?github [repository]` — Get info on a GitHub repository',
+        '- `?cat` — Find some cute cat pictures',
+        '- `?pug` — Find some cute pug pictures',
+        '- `?itunes [song]` — Get info on a song',
+        '- `?dog` — Find some cute dog pictures',
+        '- `?pokemon [pokemon]` — Get info on Pokémon',
+        '- `?norris` — Get a random Chuck Norris fact',
+        '- `?covid` — Get COVID-19 stats',
+        '- `?poll [question] [choices]` — Start a poll (max 10 choices)',
+        '- `?roll` — Roll the dice (d4, d6, d8, d10, d12, d20, d100)',
+        '- `?randomcolor` — Generates a random hex color with preview',
+        '- `?dynoavatar` — Generates a Dyno-like avatar',
+      ],
+    },
+    {
+      name: 'Utility',
+      commands: [
+        '- `?afk` — Set an AFK status to display when you are mentioned',
+        '- `?avatar` — Get a users avatar',
+        '- `?remindme` — Set a reminder',
+        '- `?membercount` — Get the server member count',
+        '- `?whois` — Get user information',
+        '- `?inviteinfo` — Get information about an invite',
+        '- `?clean` — Clean up Dyno responses',
+        '- `?nick` — Change the bot nickname',
+        '- `?members` — List members in a role(s) (max 90)',
+        '- `?giveaway` — Create and manage giveaways',
+        '- `?info` — Get bot info',
+        '- `?stats` — Get bot stats',
+        '- `?uptime` — Get bot uptime',
+        '- `?ping` — Ping the bot',
+        '- `?premium` — Dyno premium information (Responds in DM)',
+        '- `?serverinfo` — Get server info/stats',
+        '- `?highlights` — Get notified when a specific phrase is said in a server',
+        '- `?emotes` — Gets a list of server emojis',
+        '- `?discrim` — Shows users with a certain discriminator',
+        '- `?color` — Show a color using hex',
+        '- `?distance` — Get the distance between two sets of coordinates',
+      ],
+    },
+    {
+      name: 'Moderation',
+      commands: [
+        '- `?warn` — Warn a member',
+        '- `?warnings` — Get warnings for a user',
+        '- `?clearwarn` — Clear warnings for a user',
+        '- `?delwarn` — Delete a warning',
+        '- `?delnote` — Delete a note about a member',
+        '- `?clearnotes` — Delete all notes for a member',
+        '- `?editnote` — Edit a note about a member',
+        '- `?note` — Add note(s) about a member',
+        '- `?notes` — Get notes for a user',
+        '- `?mute` — Mute a member so they cannot type',
+        '- `?unmute` — Unmute a member',
+        '- `?deafen` — Deafen a member',
+        '- `?undeafen` — Undeafen a member',
+        '- `?kick` — Kick a member',
+        '- `?ban` — Ban a member, optional time limit',
+        '- `?unban` — Unban a member',
+        '- `?softban` — Softban a member (ban and immediate unban to delete messages)',
+        '- `?purge` — Delete a number of messages from a channel (limit 1000)',
+        '- `?announce` — Send an announcement using the bot',
+        '- `?modlogs` — Get a list of moderation logs for a user',
+        '- `?modstats` — Get moderation statistics for a mod/admin',
+        '- `?moderations` — Get a list of active moderations (timed)',
+        '- `?case` — Show a single mod log case',
+        '- `?reason` — Supply a reason for a mod log case',
+        '- `?duration` — Change the duration of a mute/ban',
+        '- `?slowmode` — Enable/disable slowmode',
+        '- `?lock` — Lock a channel with optional timer and message',
+        '- `?unlock` — Unlock a previously locked channel',
+        '- `?lockdown` — Lock channels defined in moderation settings',
+        '- `?ignored` — List ignored users, roles, and channels',
+        '- `?rolepersist` — Assign/unassign a role that persists if the user leaves and rejoins',
+        '- `?temprole` — Assign/unassign a role that persists for a limited time',
+        '- `?star` — View starboard stats for a message',
+      ],
+    },
+    {
+      name: 'Admin',
+      commands: [
+        '- `?addmod` — Add a moderator role',
+        '- `?delmod` — Remove a moderator role',
+        '- `?listmods` — List moderators',
+        '- `?addrole` — Add a new role with optional color and hoist',
+        '- `?delrole` — Delete a role',
+        '- `?rolecolor` — Change the color of a role',
+        '- `?rolename` — Change the name of a role',
+        '- `?mentionable` — Toggle making a role mentionable on/off',
+        '- `?role` — Add/remove a user to a role or roles',
+        '- `?module` — Enable/disable a module',
+        '- `?modules` — List available modules',
+        '- `?command` — Enable/disable a command',
+        '- `?customs` — List, enable, disable custom commands',
+        '- `?prefix` — Get or set the command prefix for this server',
+        '- `?ignorechannel` — Toggles command usage in a channel',
+        '- `?ignoreuser` — Toggles command usage for a user',
+        '- `?ignorerole` — Toggles command usage for a role',
+        '- `?setnick` — Change the nickname of a user',
+        '- `?addemote` — Adds an emote to the server',
+        '- `?addrank` — Add a new rank for members to join (role must exist)',
+        '- `?delrank` — Delete an existing rank (does not delete the role)',
+        '- `?rank` — Join/leave a rank',
+        '- `?ranks` — Get a list of joinable ranks',
+        '- `?roles` — Get a list of server roles',
+        '- `?roleinfo` — Get information about a role',
+      ],
+    },
+  ],
+};
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const CMDS_PER_PAGE = 10;
 const BLACK = 0x111111;
+const TIER_ORDER = ['owner', 'staff_manager', 'staff', 'trial', 'support', 'verified'];
 
-// Category groupings — commands are pulled from help.json for the user's tier
-const CATEGORY_KEYWORDS = {
-  'Fun': ['rps', 'flip', 'flipcoin', 'space', 'dadjoke', 'github', 'cat', 'pug',
-          'itunes', 'dog', 'pokemon', 'norris', 'roll', 'randomcolor', 'dynoavatar', 'covid'],
-  'Utility': ['info', 'stats', 'uptime', 'ping', 'premium', 'whois', 'avatar',
-              'serverinfo', 'membercount', 'roles', 'roleinfo', 'members', 'inviteinfo',
-              'remindme', 'afk', 'highlights', 'emotes', 'discrim', 'color', 'distance', 'help'],
-  'Moderation': ['mute', 'unmute', 'ban', 'unban', 'kick', 'softban', 'warn', 'warnings',
-                 'clearwarn', 'delwarn', 'purge', 'lock', 'unlock', 'lockdown', 'slowmode',
-                 'deafen', 'undeafen', 'modlogs', 'modstats', 'moderations', 'case', 'reason',
-                 'duration', 'note', 'notes', 'delnote', 'editnote', 'clearnotes', 'clean',
-                 'rolepersist', 'temprole', 'ignored'],
-  'Admin': ['addmod', 'delmod', 'listmods', 'addrole', 'delrole', 'rolecolor', 'rolename',
-            'mentionable', 'role', 'module', 'modules', 'command', 'customs', 'prefix',
-            'ignorechannel', 'ignoreuser', 'ignorerole', 'nick', 'setnick', 'announce',
-            'giveaway', 'addemote', 'addrank', 'delrank', 'rank', 'ranks', 'star',
-            'modstats', 'lockdown'],
-  'Staff Tools': ['getstafftag', 'switchstafftag', 'checkproof', 'checkblacklist',
-                  'steal', 'adduser', 'removeuser', 'finduser', 'robloxavatar',
-                  'mute+', 'muteinfo', 'mutelist', 'banid', 'delmsgs'],
-};
-
-// ── Build paged categories for a given tier ───────────────────────────────────
-function buildPagesForTier(tier) {
-  const cmds = helpData[tier] || [];
-
-  // Sort commands into categories
-  const buckets = {};
-  for (const catName of Object.keys(CATEGORY_KEYWORDS)) buckets[catName] = [];
-
-  for (const cmdStr of cmds) {
-    const match = cmdStr.match(/`\?(\S+)/);
-    const name = match ? match[1].toLowerCase().replace('+', '+') : '';
-
-    let placed = false;
-    for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-      if (keywords.some(k => name.startsWith(k.toLowerCase()))) {
-        buckets[cat].push(cmdStr);
-        placed = true;
-        break;
-      }
-    }
-    if (!placed) buckets['Utility'].push(cmdStr); // fallback
+// ── Get member tier ───────────────────────────────────────────────────────────
+function getMemberTier(message) {
+  if (message.guild.ownerId === message.author.id) return 'owner';
+  const roleIds = message.member.roles.cache.map(r => r.id);
+  for (const tier of TIER_ORDER) {
+    if (ROLE_IDS[tier] && roleIds.includes(ROLE_IDS[tier])) return tier;
   }
+  return 'verified';
+}
 
-  // Build pages per non-empty category
-  return Object.entries(buckets)
-    .filter(([, v]) => v.length > 0)
-    .map(([name, commands]) => {
-      const pages = [];
-      for (let i = 0; i < commands.length; i += CMDS_PER_PAGE) {
-        pages.push(commands.slice(i, i + CMDS_PER_PAGE));
-      }
-      return { name, pages };
-    });
+// ── Build paged cats for tier ─────────────────────────────────────────────────
+function buildPages(tier) {
+  const cats = TIER_CATEGORIES[tier] || TIER_CATEGORIES['verified'];
+  return cats.map(cat => {
+    const pages = [];
+    for (let i = 0; i < cat.commands.length; i += CMDS_PER_PAGE) {
+      pages.push(cat.commands.slice(i, i + CMDS_PER_PAGE));
+    }
+    return { name: cat.name, pages };
+  });
 }
 
 // ── Embed ─────────────────────────────────────────────────────────────────────
-function makeEmbed(cats, catIndex, pageIndex, tier) {
+function makeEmbed(cats, catIndex, pageIndex) {
   const cat = cats[catIndex];
-  const page = cat.pages[pageIndex];
-  const totalPages = cat.pages.length;
-
   return new EmbedBuilder()
     .setTitle(`Commands — ${cat.name}`)
     .setColor(BLACK)
-    .setDescription(page.join('\n\n'))
+    .setDescription(cat.pages[pageIndex].join('\n'))
     .setFooter({
-      text: `Page ${pageIndex + 1}/${totalPages}  |  Category ${catIndex + 1}/${cats.length}  |  Tier: ${tier}`,
+      text: `Page ${pageIndex + 1}/${cat.pages.length}  |  Category ${catIndex + 1}/${cats.length}`,
     });
 }
 
@@ -141,7 +435,7 @@ function makeCatRow(cats, catIndex) {
   return row;
 }
 
-// ── Command ───────────────────────────────────────────────────────────────────
+// ── Command export ────────────────────────────────────────────────────────────
 module.exports = {
   name: 'help',
   aliases: ['h', 'commands', 'cmds'],
@@ -149,17 +443,13 @@ module.exports = {
 
   async execute(message) {
     const tier = getMemberTier(message);
-    const cats = buildPagesForTier(tier);
-
-    if (!cats.length) {
-      return message.reply('No commands available for your role.');
-    }
+    const cats = buildPages(tier);
 
     let catIndex = 0;
     let pageIndex = 0;
 
     const reply = await message.reply({
-      embeds: [makeEmbed(cats, catIndex, pageIndex, tier)],
+      embeds: [makeEmbed(cats, catIndex, pageIndex)],
       components: [makeCatRow(cats, catIndex), makeNavRow(cats, catIndex, pageIndex)],
     });
 
@@ -171,29 +461,21 @@ module.exports = {
 
     collector.on('collect', async interaction => {
       const id = interaction.customId;
-
-      if (id === 'prev_page') {
-        pageIndex = Math.max(0, pageIndex - 1);
-      } else if (id === 'next_page') {
-        pageIndex = Math.min(cats[catIndex].pages.length - 1, pageIndex + 1);
-      } else if (id.startsWith('cat_')) {
-        catIndex = parseInt(id.split('_')[1]);
-        pageIndex = 0;
-      }
+      if (id === 'prev_page') pageIndex = Math.max(0, pageIndex - 1);
+      else if (id === 'next_page') pageIndex = Math.min(cats[catIndex].pages.length - 1, pageIndex + 1);
+      else if (id.startsWith('cat_')) { catIndex = parseInt(id.split('_')[1]); pageIndex = 0; }
 
       await interaction.update({
-        embeds: [makeEmbed(cats, catIndex, pageIndex, tier)],
+        embeds: [makeEmbed(cats, catIndex, pageIndex)],
         components: [makeCatRow(cats, catIndex), makeNavRow(cats, catIndex, pageIndex)],
       });
     });
 
     collector.on('end', async () => {
-      const disabledNav = makeNavRow(cats, catIndex, pageIndex);
-      const disabledCat = makeCatRow(cats, catIndex);
-      for (const row of [disabledNav, disabledCat]) {
-        for (const btn of row.components) btn.setDisabled(true);
-      }
-      await reply.edit({ components: [disabledCat, disabledNav] }).catch(() => {});
+      const dNav = makeNavRow(cats, catIndex, pageIndex);
+      const dCat = makeCatRow(cats, catIndex);
+      for (const row of [dNav, dCat]) for (const btn of row.components) btn.setDisabled(true);
+      await reply.edit({ components: [dCat, dNav] }).catch(() => {});
     });
   },
 };
