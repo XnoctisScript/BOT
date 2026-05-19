@@ -74,12 +74,27 @@ client.on('messageCreate', async (message) => {
 
     if (message.channel.id === channelId) {
       if (!message.content.startsWith(PREFIX)) {
+        const reference = message.reference;
+        let replyPayload = null;
+
+        // If the mocked user was replying to someone, fetch that message
+        if (reference) {
+          const repliedTo = await message.channel.messages.fetch(reference.messageId).catch(() => null);
+          if (repliedTo) {
+            replyPayload = {
+              messageReference: repliedTo.id,
+              failIfNotExists: false,
+            };
+          }
+        }
+
         await message.delete().catch(() => {});
         await webhook.send({
           content: message.content || '\u200b',
           username: message.member?.displayName ?? message.author.username,
           avatarURL: message.author.displayAvatarURL({ size: 256, extension: 'png' }),
           files: [...message.attachments.values()],
+          ...(replyPayload && { reply: replyPayload }),
         }).catch(console.error);
         return;
       }
