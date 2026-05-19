@@ -247,6 +247,7 @@ const TIER_CATEGORIES = {
         '- `?slowmode`  Enable/disable slowmode',
         '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
         '- `?unmock [@user]`  Stop mocking a user',
+        '- `?announce [#channel] [message]`  Send an announcement embed to a channel',
       ],
     },
   ],
@@ -338,6 +339,7 @@ const TIER_CATEGORIES = {
         '- `?star`  View starboard stats for a message',
         '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
         '- `?unmock [@user]`  Stop mocking a user',
+        '- `?announce [#channel] [message]`  Send an announcement embed to a channel',
       ],
     },
     {

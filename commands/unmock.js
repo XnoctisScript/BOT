@@ -7,16 +7,16 @@ module.exports = {
 
   async execute(message, args, client) {
     if (!isStaffManager(message.member)) {
-      return message.reply('❌ You do not have permission to use this command.');
+      return message.reply('You do not have permission to use this command.');
     }
 
     const target = message.mentions.members.first();
     if (!target) {
-      return message.reply('❌ Please mention a user to unmock. Usage: `?unmock @user`');
+      return message.reply('Please mention a user to unmock. Usage: `?unmock @user`');
     }
 
     if (!mockedUsers.has(target.id)) {
-      return message.reply(`⚠️ **${target.user.username}** is not currently being mocked.`);
+      return message.reply(`**${target.user.username}** is not currently being mocked.`);
     }
 
     const { webhook } = mockedUsers.get(target.id);
@@ -24,6 +24,6 @@ module.exports = {
     mockedUsers.delete(target.id);
 
     await message.delete().catch(() => {});
-    await message.channel.send(`✅ **${target.displayName}** is no longer being mocked.`);
+    await message.channel.send(`**${target.displayName}** is no longer being mocked.`);
   },
 };
