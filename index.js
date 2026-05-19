@@ -1,7 +1,13 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const { mockedUsers } = require('./mockStore');
+
+function loadWelcomeConfig() {
+  const p = path.join(__dirname, 'welcomeConfig.json');
+  if (!fs.existsSync(p)) return {};
+  return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
 
 const client = new Client({
   intents: [
@@ -31,19 +37,43 @@ for (const file of commandFiles) {
 const PREFIX = '?';
 
 client.once('ready', () => {
-  console.log(`✅ Logged in as ${client.user.tag}`);
+  console.log(`Logged in as ${client.user.tag}`);
 });
 
+// ── Welcome event ────────────────────────────────────────────────────────────
+client.on('guildMemberAdd', async (member) => {
+  const config = loadWelcomeConfig();
+  const channelId = config[member.guild.id];
+  if (!channelId) return;
+
+  const channel = member.guild.channels.cache.get(channelId);
+  if (!channel) return;
+
+  const memberCount = member.guild.memberCount;
+
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: 'Welcome',
+      iconURL: member.guild.iconURL({ dynamic: true }),
+    })
+    .setDescription(`${member} has joined the server.`)
+    .addFields({ name: 'Member count', value: memberCount.toLocaleString() })
+    .setThumbnail(member.user.displayAvatarURL({ size: 256, dynamic: true }))
+    .setColor(0x111111)
+    .setTimestamp();
+
+  await channel.send({ embeds: [embed] }).catch(console.error);
+});
+
+// ── Message handler ──────────────────────────────────────────────────────────
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
-  // ── Mock interception ──────────────────────────────────────────────────────
+  // Mock interception
   if (mockedUsers.has(message.author.id)) {
     const { channelId, webhook } = mockedUsers.get(message.author.id);
 
-    // Only intercept in the channel the mock was set up in
     if (message.channel.id === channelId) {
-      // Ignore if it's a bot command (so ?unmock still works)
       if (!message.content.startsWith(PREFIX)) {
         await message.delete().catch(() => {});
         await webhook.send({
@@ -57,7 +87,7 @@ client.on('messageCreate', async (message) => {
     }
   }
 
-  // ── Command handling ───────────────────────────────────────────────────────
+  // Command handling
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/\s+/);

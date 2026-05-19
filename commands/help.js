@@ -248,6 +248,8 @@ const TIER_CATEGORIES = {
         '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
         '- `?unmock [@user]`  Stop mocking a user',
         '- `?announce [#channel] [message]`  Send an announcement embed to a channel',
+        '- `?nuke`  Delete all messages in the current channel',
+        '- `?welcome [#channel]`  Set the welcome channel for new member join messages',
       ],
     },
   ],
@@ -340,6 +342,8 @@ const TIER_CATEGORIES = {
         '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
         '- `?unmock [@user]`  Stop mocking a user',
         '- `?announce [#channel] [message]`  Send an announcement embed to a channel',
+        '- `?nuke`  Delete all messages in the current channel',
+        '- `?welcome [#channel]`  Set the welcome channel for new member join messages',
       ],
     },
     {
