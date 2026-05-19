@@ -1,19 +1,12 @@
 const { mockedUsers } = require('../mockStore');
-const helpConfig = require('../help.json');
-
-// Role IDs allowed to use this command (pulled from help.json)
-const ALLOWED_ROLES = [
-  helpConfig.roles.staff_manager,
-  helpConfig.roles.owner,
-].filter(Boolean);
+const { isStaffManager } = require('../utils/permissions');
 
 module.exports = {
   name: 'mock',
   description: 'Mock a user by turning their messages into webhook messages',
 
   async execute(message, args, client) {
-    const hasPermission = ALLOWED_ROLES.some(id => message.member.roles.cache.has(id));
-    if (!hasPermission) {
+    if (!isStaffManager(message.member)) {
       return message.reply('❌ You do not have permission to use this command.');
     }
 
@@ -34,7 +27,6 @@ module.exports = {
       return message.reply(`⚠️ **${target.user.username}** is already being mocked.`);
     }
 
-    // Create a webhook in the current channel
     const webhook = await message.channel.createWebhook({
       name: target.displayName,
       avatar: target.user.displayAvatarURL({ size: 256, extension: 'png' }),

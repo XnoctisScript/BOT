@@ -245,6 +245,8 @@ const TIER_CATEGORIES = {
         '- `?moderations`  Get a list of active moderations (timed)',
         '- `?duration`  Change the duration of a mute/ban',
         '- `?slowmode`  Enable/disable slowmode',
+        '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
+        '- `?unmock [@user]`  Stop mocking a user',
       ],
     },
   ],
@@ -334,6 +336,8 @@ const TIER_CATEGORIES = {
         '- `?rolepersist`  Assign/unassign a role that persists if the user leaves and rejoins',
         '- `?temprole`  Assign/unassign a role that persists for a limited time',
         '- `?star`  View starboard stats for a message',
+        '- `?mock [@user]`  Mock a user by sending their messages as a webhook',
+        '- `?unmock [@user]`  Stop mocking a user',
       ],
     },
     {

@@ -1,18 +1,12 @@
 const { mockedUsers } = require('../mockStore');
-const helpConfig = require('../help.json');
-
-const ALLOWED_ROLES = [
-  helpConfig.roles.staff_manager,
-  helpConfig.roles.owner,
-].filter(Boolean);
+const { isStaffManager } = require('../utils/permissions');
 
 module.exports = {
   name: 'unmock',
   description: 'Stop mocking a user',
 
   async execute(message, args, client) {
-    const hasPermission = ALLOWED_ROLES.some(id => message.member.roles.cache.has(id));
-    if (!hasPermission) {
+    if (!isStaffManager(message.member)) {
       return message.reply('❌ You do not have permission to use this command.');
     }
 
@@ -26,8 +20,6 @@ module.exports = {
     }
 
     const { webhook } = mockedUsers.get(target.id);
-
-    // Delete the webhook and clean up
     await webhook.delete('Unmock command used').catch(() => {});
     mockedUsers.delete(target.id);
 
