@@ -52,15 +52,14 @@ client.on('guildMemberAdd', async (member) => {
   const memberCount = member.guild.memberCount;
 
   const embed = new EmbedBuilder()
-    .setTitle(`Welcome to ${member.guild.name}`)
-    .setDescription(`${member} **has joined the server**`)
-    .setThumbnail(member.user.displayAvatarURL({ size: 512, dynamic: true, extension: 'png' }))
-    .addFields(
-      { name: 'Account', value: `<@${member.id}>`, inline: true },
-      { name: 'Member Count', value: `${memberCount.toLocaleString()}`, inline: true },
-    )
-    .setColor(0x2b2d31)
-    .setFooter({ text: member.guild.name, iconURL: member.guild.iconURL({ dynamic: true }) });
+    .setAuthor({
+      name: 'Welcome',
+      iconURL: member.guild.iconURL({ dynamic: true }),
+    })
+    .setDescription(`${member} has joined the server`)
+    .addFields({ name: 'Member count', value: memberCount.toLocaleString() })
+    .setThumbnail(member.user.displayAvatarURL({ size: 256, dynamic: true }))
+    .setColor(0x000000);
 
   await channel.send({ embeds: [embed] }).catch(console.error);
 });

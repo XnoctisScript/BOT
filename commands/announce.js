@@ -24,7 +24,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setDescription(content)
-      .setColor(0x111111)
+      .setColor(0x000000)
       .setTimestamp()
       .setFooter({ text: message.guild.name, iconURL: message.guild.iconURL({ dynamic: true }) });
 
