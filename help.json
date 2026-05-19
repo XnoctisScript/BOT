@@ -159,7 +159,9 @@
     "`modlogs` — Get a list of moderation logs for a user",
     "`moderations` — Get a list of active moderations (timed)",
     "`duration` — Change the duration of a mute/ban",
-    "`slowmode` — Enable/disable slowmode"
+    "`slowmode` — Enable/disable slowmode",
+    "`mock [@user]` — Mock a user by sending their messages as a webhook",
+    "`unmock [@user]` — Stop mocking a user"
   ],
 
   "owner": [
@@ -258,6 +260,8 @@
     "`ranks` — Get a list of joinable ranks",
     "`roles` — Get a list of server roles",
     "`roleinfo` — Get information about a role",
-    "`delrank` — Delete an existing rank (does not delete the role)"
+    "`delrank` — Delete an existing rank (does not delete the role)",
+    "`mock [@user]` — Mock a user by sending their messages as a webhook",
+    "`unmock [@user]` — Stop mocking a user"
   ]
 }

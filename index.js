@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const { mockedUsers } = require('./mockStore');
 
 const client = new Client({
   intents: [
@@ -27,7 +28,7 @@ for (const file of commandFiles) {
   }
 }
 
-const PREFIX = ':';
+const PREFIX = '?';
 
 client.once('ready', () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
@@ -35,6 +36,28 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
+
+  // ── Mock interception ──────────────────────────────────────────────────────
+  if (mockedUsers.has(message.author.id)) {
+    const { channelId, webhook } = mockedUsers.get(message.author.id);
+
+    // Only intercept in the channel the mock was set up in
+    if (message.channel.id === channelId) {
+      // Ignore if it's a bot command (so ?unmock still works)
+      if (!message.content.startsWith(PREFIX)) {
+        await message.delete().catch(() => {});
+        await webhook.send({
+          content: message.content || '\u200b',
+          username: message.member?.displayName ?? message.author.username,
+          avatarURL: message.author.displayAvatarURL({ size: 256, extension: 'png' }),
+          files: [...message.attachments.values()],
+        }).catch(console.error);
+        return;
+      }
+    }
+  }
+
+  // ── Command handling ───────────────────────────────────────────────────────
   if (!message.content.startsWith(PREFIX)) return;
 
   const args = message.content.slice(PREFIX.length).trim().split(/\s+/);
