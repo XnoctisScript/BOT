@@ -20,7 +20,6 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Load commands
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(f => f.endsWith('.js'));
 
@@ -40,7 +39,7 @@ client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
-// ── Welcome event ────────────────────────────────────────────────────────────
+// ── Welcome event ─────────────────────────────────────────────────────────────
 client.on('guildMemberAdd', async (member) => {
   const config = loadWelcomeConfig();
   const channelId = config[member.guild.id];
@@ -64,7 +63,7 @@ client.on('guildMemberAdd', async (member) => {
   await channel.send({ embeds: [embed] }).catch(console.error);
 });
 
-// ── Message handler ──────────────────────────────────────────────────────────
+// ── Message handler ───────────────────────────────────────────────────────────
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
@@ -74,27 +73,27 @@ client.on('messageCreate', async (message) => {
 
     if (message.channel.id === channelId) {
       if (!message.content.startsWith(PREFIX)) {
-        const reference = message.reference;
-        let replyPayload = null;
+        let content = message.content || '\u200b';
 
-        // If the mocked user was replying to someone, fetch that message
-        if (reference) {
-          const repliedTo = await message.channel.messages.fetch(reference.messageId).catch(() => null);
+        // If replying to someone, prepend a mention of who they replied to
+        if (message.reference) {
+          const repliedTo = await message.channel.messages
+            .fetch(message.reference.messageId)
+            .catch(() => null);
           if (repliedTo) {
-            replyPayload = {
-              messageReference: repliedTo.id,
-              failIfNotExists: false,
-            };
+            const preview = repliedTo.content
+              ? repliedTo.content.slice(0, 50) + (repliedTo.content.length > 50 ? '...' : '')
+              : '[attachment]';
+            content = `> **${repliedTo.member?.displayName ?? repliedTo.author.username}**: ${preview}\n${content}`;
           }
         }
 
         await message.delete().catch(() => {});
         await webhook.send({
-          content: message.content || '\u200b',
+          content,
           username: message.member?.displayName ?? message.author.username,
           avatarURL: message.author.displayAvatarURL({ size: 256, extension: 'png' }),
           files: [...message.attachments.values()],
-          ...(replyPayload && { reply: replyPayload }),
         }).catch(console.error);
         return;
       }
